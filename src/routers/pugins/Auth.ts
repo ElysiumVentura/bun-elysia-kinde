@@ -10,6 +10,14 @@ const UserSchema = z.object({
     id: z.string(),
 });
 
+export type User = {
+    id: string;
+    firstName: string;
+    lastName: string;
+    email: string;
+    permissions: string[];
+};
+
 const Auth = (sessionManager: SessionManager) =>
     new Elysia().use(cookie()).derive(async ({ cookie: { sessionId } }) => {
         const session = sessionManager.getSession(sessionId);
@@ -21,8 +29,22 @@ const Auth = (sessionManager: SessionManager) =>
             throw new Error("Unauthorised");
         }
 
+        // this is where we would call db to get the user's permissions
+        const permissions = ["read:user", "write:user"];
+
+        if (!permissions) {
+            throw new Error("unable to load permissions");
+        }
+
         return {
-            user: result.data,
+            user: {
+                id: result.data.id,
+                firstName: result.data.given_name,
+                lastName: result.data.family_name,
+                email: result.data.email,
+                permissions,
+            },
+            permissions,
             session,
         };
     });

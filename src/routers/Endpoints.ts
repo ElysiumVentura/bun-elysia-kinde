@@ -1,14 +1,7 @@
 import { Elysia } from "elysia";
 import { cookie } from "@elysiajs/cookie";
-import { AuthPlugin } from "./pugins";
+import { AuthPlugin, User } from "./pugins";
 import { SessionManager } from "../helpers";
-
-type User = {
-    given_name: string;
-    family_name: string;
-    email: string;
-    id: string;
-};
 
 const EndpointRoutes = (sessionManager: SessionManager) =>
     new Elysia()
@@ -20,10 +13,15 @@ const EndpointRoutes = (sessionManager: SessionManager) =>
         .get("/world", () => {
             return "World!";
         })
-        .get("/user", ({ user }) => {
-            // user is set by the AuthPlugin
-            return `Hello ${user.given_name} ${user.family_name}!`;
-        })
+        .get(
+            "/user",
+            ({ user }) => {
+                // user is set by the AuthPlugin
+                return `Hello ${user.firstName} ${user.lastName}!`;
+            },
+            // we can also protect routes with middleware
+            { beforeHandle: ({ user }) => checkPermissions(user, "read:user") },
+        )
         .get("/session", ({ session }) => {
             // we can also access user through the session
             return {
@@ -39,13 +37,13 @@ const EndpointRoutes = (sessionManager: SessionManager) =>
                     user: session.getSessionItem("user"),
                 };
             },
-            // we can also protect routes with middleware
+            // this route will fail permission checking
             { beforeHandle: ({ user }) => checkPermissions(user, "read:session") },
         );
 
 function checkPermissions(user: User, permission: string) {
-    if (permission === "read:session") {
-        throw new Error(`User ${user.given_name} does not have permission to read:session`);
+    if (!user.permissions.includes(permission)) {
+        throw new Error(`User ${user.firstName} does not have permission to read:session`);
     }
 }
 
