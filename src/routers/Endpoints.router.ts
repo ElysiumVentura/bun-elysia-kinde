@@ -2,6 +2,7 @@ import { Elysia } from "elysia";
 import { cookie } from "@elysiajs/cookie";
 import { AuthPlugin, User } from "./pugins";
 import { SessionManager } from "../helpers";
+import { EndpointHandler } from "../handlers";
 
 const EndpointRoutes = (sessionManager: SessionManager) =>
     new Elysia()
@@ -15,10 +16,8 @@ const EndpointRoutes = (sessionManager: SessionManager) =>
         })
         .get(
             "/user",
-            ({ user }) => {
-                // user is set by the AuthPlugin
-                return `Hello ${user.firstName} ${user.lastName}!`;
-            },
+            // we can access the user object from the request context
+            ({ user }) => EndpointHandler.getUser(user),
             // we can also protect routes with middleware
             { beforeHandle: ({ user }) => checkPermissions(user, "read:user") },
         )

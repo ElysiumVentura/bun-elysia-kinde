@@ -1,2 +1,2 @@
-export { default as PublicRoutes } from "./Public";
-export { default as EndpointRoutes } from "./Endpoints";
+export { default as PublicRoutes } from "./Public.router";
+export { default as EndpointRoutes } from "./Endpoints.router";
