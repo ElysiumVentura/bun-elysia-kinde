@@ -21,19 +21,19 @@ const EndpointRoutes = (sessionManager: SessionManager) =>
             // we can also protect routes with middleware
             { beforeHandle: ({ user }) => checkPermissions(user, "read:user") },
         )
-        .get("/session", ({ session }) => {
+        .get("/session", async ({ session }) => {
             // we can also access user through the session
             return {
                 sessionId: session.sessionId,
-                user: session.getSessionItem("user"),
+                user: await session.getSessionItem("user"),
             };
         })
         .get(
             "/session-protected",
-            ({ session }) => {
+            async ({ session }) => {
                 return {
                     sessionId: session.sessionId,
-                    user: session.getSessionItem("user"),
+                    user: await session.getSessionItem("user"),
                 };
             },
             // this route will fail permission checking
