@@ -2,4 +2,4 @@ dev:
 	bun --hot run index.ts
 
 test:
-	bun test --watch
+	bun test --watch --preload ./preloadMocks.ts

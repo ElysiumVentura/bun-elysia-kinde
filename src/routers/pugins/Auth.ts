@@ -18,35 +18,34 @@ export type User = {
     permissions: string[];
 };
 
-const Auth = (sessionManager: SessionManager) =>
-    new Elysia().use(cookie()).derive(async ({ cookie: { sessionId } }) => {
-        const session = sessionManager.getSession(sessionId);
-        const user = (await session?.getSessionItem("user")) ?? null;
+const Auth = new Elysia().use(cookie()).derive(async ({ cookie: { sessionId } }) => {
+    const session = await SessionManager.getSession(sessionId);
+    const user = (await session.getSessionItem("user")) ?? null;
 
-        const result = UserSchema.safeParse(user);
+    const result = UserSchema.safeParse(user);
 
-        if (!user || !result.success) {
-            throw new Error("Unauthorised");
-        }
+    if (!user || !result.success) {
+        throw new Error("Unauthorised");
+    }
 
-        // this is where we would call db to get the user's permissions
-        const permissions = ["read:user", "write:user"];
+    // this is where we would call db to get the user's permissions
+    const permissions = ["read:user", "write:user"];
 
-        if (!permissions) {
-            throw new Error("unable to load permissions");
-        }
+    if (!permissions) {
+        throw new Error("unable to load permissions");
+    }
 
-        return {
-            user: {
-                id: result.data.id,
-                firstName: result.data.given_name,
-                lastName: result.data.family_name,
-                email: result.data.email,
-                permissions,
-            },
+    return {
+        user: {
+            id: result.data.id,
+            firstName: result.data.given_name,
+            lastName: result.data.family_name,
+            email: result.data.email,
             permissions,
-            session,
-        };
-    });
+        },
+        permissions,
+        session,
+    };
+});
 
 export default Auth;
