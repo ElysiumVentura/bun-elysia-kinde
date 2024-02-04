@@ -1,48 +1,31 @@
 import { Elysia } from "elysia";
 import { cookie } from "@elysiajs/cookie";
-import { AuthPlugin, User } from "./pugins";
+import { AuthPlugin, PermissionsPlugin } from "./pugins";
 import { EndpointHandler } from "../handlers";
 
 const EndpointRoutes = new Elysia()
     .use(cookie())
     .use(AuthPlugin)
+    .use(PermissionsPlugin)
     .get("/hello", () => {
-        return "Hello!";
-    })
-    .get("/world", () => {
         return "World!";
     })
     .get(
         "/user",
-        // we can access the user object from the request context
+        // we can now access the user object from the context
         ({ user }) => EndpointHandler.getUser(user),
-        // we can also protect routes with middleware
-        { beforeHandle: ({ user }) => checkPermissions(user, "read:user") },
+        { permission: "read:user" },
     )
-    .get("/session", async ({ session }) => {
-        // we can also access user through the session
-        return {
-            sessionId: session.sessionId,
-            user: await session.getSessionItem("user"),
-        };
-    })
     .get(
-        "/session-protected",
+        "/session",
         async ({ session }) => {
+            // we can also access user through the session
             return {
                 sessionId: session.sessionId,
                 user: await session.getSessionItem("user"),
             };
         },
-        // this route will fail permission checking
-        { beforeHandle: ({ user }) => checkPermissions(user, "read:session") },
+        { permission: "read:session" },
     );
-
-// this can be done better using the `macro` feature
-function checkPermissions(user: User, permission: string) {
-    if (!user.permissions.includes(permission)) {
-        throw new Error(`User ${user.firstName} does not have permission to read:session`);
-    }
-}
 
 export default EndpointRoutes;

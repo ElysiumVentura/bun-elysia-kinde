@@ -7,7 +7,7 @@
     "@elysiajs/cors": "^0.8.0",
     "@elysiajs/swagger": "^0.8.5",
     "@kinde-oss/kinde-typescript-sdk": "^2.6.2",
-    "elysia": "^0.8.15",
+    "elysia": "latest",
     "elysia-session": "^0.0.5",
     "flush-promises": "^1.0.2",
     "ioredis": "^5.3.2",

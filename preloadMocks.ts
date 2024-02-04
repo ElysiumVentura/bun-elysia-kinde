@@ -9,7 +9,3 @@ mock.module("crypto", () => {
 mock.module("./src/helpers/redis/Redis.ts", () => {
     return { default: redisMock };
 });
-
-// mock.module("./src/helpers/sessionManager/sessionManager.ts", () => {
-//     return { default: () => "---" };
-// });
